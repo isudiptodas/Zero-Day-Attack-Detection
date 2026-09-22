@@ -2,8 +2,11 @@ import pandas as pd
 
 # reading all csv data
 def readAllCSV():
-    for i in range(1, 24):
-        print(f"\nDATASET {i}:")
+    for i in range(1, 19):
+        print(f"{"-"*50}")
+        print(f"DATASET {i}")
+        print(f"{"-"*50}")
+        
         csv = pd.read_csv(f"./dataset/dataset{i}.csv")
         print(csv)
         print("\n") 
@@ -17,13 +20,14 @@ def readCSV(num: int):
         
 
 #check all csv info
-def auditAllCSV():
-    for i in range(1, 2):
+def checkAllCSVInfo():
+    for i in range(1, 19):
 
         df = pd.read_csv(f"./dataset/dataset{i}.csv")
 
-        print(f"\n{'=' * 60}")
+        print(f"{"-"*50}")
         print(f"DATASET {i}")
+        print(f"{"-"*50}")
         print(f"Rows: {df.shape[0]}")
         print(f"Columns: {df.shape[1]}")
 
@@ -49,31 +53,35 @@ def auditAllCSV():
 
 
 # dividing last column into 3 individual column
-def divideCombinedColumn():
-    for i in range(1, 2):
+def divideCombinedColumn(num: int):
+    df = pd.read_csv(f"./dataset/dataset{num}.csv")
+    
+    last_column = df.columns[-1]
+    split_data = df[last_column].str.split(r'\s{2,}|\t', expand=True)
+    
+    split_data.columns = [
+        "tunnel_parents",
+        "label",
+        "detailed-label"
+    ]
+    
+    df = df.drop(columns=[last_column])
+    df = pd.concat([df, split_data], axis=1)
+    df.to_csv(f"./dataset/dataset{num}.csv", index=False)
+    
+    print(f"Combined column fixed for dataset {num}")
 
-        df = pd.read_csv(f"./dataset/dataset{i}.csv")
 
-        last_column = df.columns[-1]
-        split_data = df[last_column].str.split(r'\s{2,}|\t', expand=True)
-
-        split_data.columns = [
-            "tunnel_parents",
-            "label",
-            "detailed-label"
-        ]
-
-        df = df.drop(columns=[last_column])
-        df = pd.concat([df, split_data], axis=1)
-        df.to_csv(f"./dataset/dataset{i}.csv", index=False)
-
-        print(f"Combined column fixed for dataset {i}")
-
-# check dash values of any dataset
+# check dash values of dataset
 def checkDashValue():
     for i in range(1, 2):
         csv = pd.read_csv(f"./dataset/dataset{i}.csv")
         dash_count = (csv == "-").sum()
-        print(dash_count[dash_count > 0])
 
-auditAllCSV()
+        print(f"{"-"*50}")
+        print(f"DATASET {i}")
+        print(f"{"-"*50}")
+        print(dash_count[dash_count > 0])
+        print(f"\nTotal rows: {csv.shape[0]}")
+
+checkDashValue()
